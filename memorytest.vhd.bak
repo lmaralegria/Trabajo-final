@@ -1,0 +1,73 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+entity memorytest is
+    
+    port
+    (
+        -- Input ports
+        address: in std_logic_vector(7 downto 0);
+        data_in: in std_logic_vector (7 downto 0);
+        writes: in std_logic;
+        clock: in std_logic;
+        reset: in std_logic;
+        port_in_00: in std_logic_vector(7 downto 0);
+        port_in_01: in std_logic_vector(7 downto 0);
+
+        -- Output ports
+        port_out_00 : out std_logic_vector(7 downto 0);
+        port_out_01 : out std_logic_vector(7 downto 0));
+		  O0, O1, O2, O3 : out std_logic_vector(6 downto 0)
+    );
+	 
+end memorytest;
+
+
+architecture arch_memorytest of memorytest is
+
+    component memory 
+        port
+        (
+             -- Input ports
+        address: in std_logic_vector(7 downto 0);
+        data_in: in std_logic_vector (7 downto 0);
+        writes: in std_logic;
+        clock: in std_logic;
+        reset: in std_logic;
+        port_in_00: in std_logic_vector(7 downto 0);
+        port_in_01: in std_logic_vector(7 downto 0);
+
+        -- Output ports
+        data_out: out std_logic_vector (7 downto 0);
+        port_out_00 : out std_logic_vector(7 downto 0);
+        port_out_01 : out std_logic_vector(7 downto 0))
+        );
+    end component;
+    
+    component FullDecoBCD
+        port
+        (
+            -- Input ports
+            A, B, C, D    : in  std_logic;
+
+            -- Output ports
+            S    : out std_logic_vector(6 downto 0)
+
+        );
+    end component;
+
+    signal T: std_logic_vector(7 downto 0);
+    --signal T0, T1, T2, T3, T4, T5, T6, T7 : std_logic;
+
+begin
+
+    U0 : memory port map (address, data_in, port_in_00, port_in_01, clock, reset, writes,T, port_out_00, port_out_01);
+                                 
+    U1 : FullDecoBCD port map (T(7), T(6), T(5), T(4), O0);
+    U2 : FullDecoBCD port map (T(3), T(2), T(1), T(0), O1);
+    U3 : FullDecoBCD port map (address(7), address(6), address(5), address(4), O2);
+    U4 : FullDecoBCD port map (address(3), address(2), address(1), address(0), O3);
+
+
+end arch_memorytest;
